@@ -1,0 +1,24 @@
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+Handling connection for 8080
+E0120 09:30:59.490777   16469 portforward.go:385] "Unhandled Error" err="error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:34542: write tcp4 127.0.0.1:8080->127.0.0.1:34542: write: broken pipe"
+Handling connection for 8080
+Handling connection for 8080
+E0120 09:31:50.563516   16469 portforward.go:385] "Unhandled Error" err="error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:8080->127.0.0.1:34394: write tcp4 127.0.0.1:8080->127.0.0.1:34394: write: broken pipe"
+Handling connection for 8080
+Handling connection for 8080
