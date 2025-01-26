@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get install -y yamllint
 
       - name: Lint YAML files
-        run: yamllint ./**/*.yaml -d "{\"extends\": \"relaxed\", \"rules\": {\"line-length\": {\"max\": 120}}}"
+        run: yamllint ./**/*.yaml -d '{"extends": "relaxed", "rules": {"line-length": {"max": 120}}}'
 
 
   Linting-md:
@@ -133,4 +133,4 @@ jobs:
 
       - name: Run Ansible Playbook to Build and Push Docker Image
         run: |
-             ansible-playbook --vault-password-file <(echo ${{ secrets.VAULT_PASSWORD }}) -e @dockerhub_credentials.yml build-push-docker.yml
+             ansible-playbook --vault-password-file <(echo ${{ secrets.VAULT_PASSWORD }}) -e @dockerhub_credentials.yml build-push-docker.yml 
