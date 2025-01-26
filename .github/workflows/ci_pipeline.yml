@@ -25,15 +25,59 @@ jobs:
           pip install -r requirements.txt
 
       - name: Lint Code
-        run: flake8 app/
+        uses: davidanson/markdownlint-cli2-action@v1
+        with:
+          config_path: .markdownlint.json
+          globs: '**/*.{md,markdown}'
 
       - name: Run Unit Tests
         run: pytest tests/
 
+  sast-scan:
+    name: SAST Analysis
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks for secrets scanning
+        uses: zricethezav/gitleaks-action@v1
+
+      - name: Check if SONAR_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "Error: SONAR_TOKEN is not set!"
+            exit 1
+          fi
+
+      - name: Run SonarCloud SAST
+        uses: SonarSource/sonarcloud-github-action@v3.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=zigzig234_Final-project
+            -Dsonar.organization=zigzig234
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
+
+      - name: Run Snyk for dependency security scan
+        uses: snyk/actions/python@master
+        with:
+          args: --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   build-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: lint-test
+    needs: sast-scan
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -47,33 +91,10 @@ jobs:
         run: |
              ansible-playbook --vault-password-file <(echo ${{ secrets.VAULT_PASSWORD }}) -e @dockerhub_credentials.yml playbook.yml
 
-  sast-scan:
-    name: SAST Analysis
-    runs-on: ubuntu-latest
-    needs: build-push
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run OWASP Dependency-Check
-        uses: dependency-check/gha@v2
-        with:
-          project: "MyApp"
-          output-directory: dependency-check-report
-
-      - name: Upload Dependency-Check Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependency-check-report
-          path: dependency-check-report
-
-      - name: Run CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-
   deploy:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
-    needs: sast-scan
+    needs: build-push
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
