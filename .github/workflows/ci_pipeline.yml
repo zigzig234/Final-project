@@ -37,6 +37,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      
+         - name: Set up Python environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install requests
 
       - name: Run Ansible Playbook to Build and Push Docker Image
         run: |
