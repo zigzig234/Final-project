@@ -1,4 +1,9 @@
 import unittest
+
+import sys
+
+sys.path.append('./app')
+
 from app import app
 
 class TestApp(unittest.TestCase):
