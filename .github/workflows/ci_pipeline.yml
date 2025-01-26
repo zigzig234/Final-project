@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Ansible Playbook to Build and Push Docker Image
         run: |
-          ansible-playbook playbook.yml --vault-password-file dockerhub_credentials.yml
+             ansible-playbook --vault-password-file <(echo ${{ secrets.VAULT_PASSWORD }}) -e @dockerhub_credentials.yml playbook.yml
 
   sast-scan:
     name: SAST Analysis
