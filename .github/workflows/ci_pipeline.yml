@@ -7,8 +7,21 @@ on:
   pull_request:
 
 jobs:
-  lint-test:
-    name: Linting and Unit Tests
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Lint Code
+        uses: davidanson/markdownlint-cli2-action@v1
+        with:
+          config_path: .markdownlint.json
+          globs: '**/*.{md,markdown}'
+
+  unit-test:
+    name: Unit-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -24,19 +37,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint Code
-        uses: davidanson/markdownlint-cli2-action@v1
-        with:
-          config_path: .markdownlint.json
-          globs: '**/*.{md,markdown}'
-
       - name: Run Unit Tests
         run: pytest tests/
 
-  sast-scan:
-    name: SAST Analysis
+  Gitleaks:
+    name: Gitleaks
     runs-on: ubuntu-latest
-    needs: lint-test
+    needs: unit-test
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -45,6 +52,17 @@ jobs:
 
       - name: Run gitleaks for secrets scanning
         uses: zricethezav/gitleaks-action@v1
+    
+  SonarQube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
 
       - name: Check if SONAR_TOKEN is set
         run: |
@@ -66,6 +84,16 @@ jobs:
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
             -Dsonar.pullrequest.branch=${{ github.head_ref }}
             -Dsonar.pullrequest.base=${{ github.base_ref }}
+
+  Snyk:
+    name: Snyk
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Snyk for dependency security scan
         uses: snyk/actions/python@master
