@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,13 +36,12 @@ jobs:
     needs: lint-test
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
-      - name: Set up Python environment
+      - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install requests
+          sudo apt-get install python3-pip
+          python3 -m pip install requests ansible
 
       - name: Run Ansible Playbook to Build and Push Docker Image
         run: |
@@ -54,7 +53,7 @@ jobs:
     needs: build-push
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run OWASP Dependency-Check
         uses: dependency-check/gha@v2
@@ -77,7 +76,7 @@ jobs:
     needs: sast-scan
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
@@ -95,7 +94,7 @@ jobs:
     needs: deploy
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Apply Monitoring Configuration
         run: |
