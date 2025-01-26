@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get install -y yamllint
 
       - name: Lint YAML files
-        run: yamllint ./**/*.yaml
+        run: yamllint ./**/*.yaml -v
 
 
   Linting-md:
