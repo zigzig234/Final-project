@@ -103,6 +103,7 @@ jobs:
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.26.0'
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
       - name: Apply Kubernetes Configuration
         run: |
