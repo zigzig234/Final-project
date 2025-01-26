@@ -35,12 +35,3 @@
         msg: "Docker image {{ image_name }}:{{ image_tag }} built and pushed successfully."
       when: build_result.changed
 
-    - name: Run Docker container from the built image
-      community.docker.docker_container:
-        name: python_app_container
-        image: "{{ image_name }}:{{ image_tag }}"
-        ports:
-          - "{{ listen_port }}:{{ listen_port }}"
-        env:
-          PORT: "{{ listen_port }}"
-        restart_policy: always
